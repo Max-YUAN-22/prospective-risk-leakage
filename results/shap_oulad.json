@@ -1,0 +1,193 @@
+{
+  "dataset": "oulad",
+  "regime": "prospective",
+  "model": "XGBoost",
+  "n_background": 22758,
+  "n_explained": 2000,
+  "features": [
+    {
+      "name": "Assessments submitted (early)",
+      "mean_abs": 0.8116015195846558
+    },
+    {
+      "name": "Mean assessment score (early)",
+      "mean_abs": 0.516553521156311
+    },
+    {
+      "name": "Active days (early)",
+      "mean_abs": 0.21620503067970276
+    },
+    {
+      "name": "Min assessment score (early)",
+      "mean_abs": 0.18776433169841766
+    },
+    {
+      "name": "Daily-click SD (early)",
+      "mean_abs": 0.13782373070716858
+    },
+    {
+      "name": "Clicks (early window)",
+      "mean_abs": 0.12798286974430084
+    },
+    {
+      "name": "Studied credits",
+      "mean_abs": 0.12313525378704071
+    },
+    {
+      "name": "Prior education = Lower Than A Level",
+      "mean_abs": 0.09323685616254807
+    },
+    {
+      "name": "Mean daily clicks (early)",
+      "mean_abs": 0.08256468921899796
+    },
+    {
+      "name": "No early assessment (flag)",
+      "mean_abs": 0.06261514127254486
+    },
+    {
+      "name": "Gender = F",
+      "mean_abs": 0.05163392797112465
+    },
+    {
+      "name": "Previous attempts",
+      "mean_abs": 0.050763003528118134
+    },
+    {
+      "name": "Region = Scotland",
+      "mean_abs": 0.024050917476415634
+    },
+    {
+      "name": "Prior education = A Level or Equivalent",
+      "mean_abs": 0.0225874874740839
+    },
+    {
+      "name": "Age band = 0-35",
+      "mean_abs": 0.022584112361073494
+    },
+    {
+      "name": "IMD band = 80-90%",
+      "mean_abs": 0.021989552304148674
+    },
+    {
+      "name": "Prior education = HE Qualification",
+      "mean_abs": 0.020855771377682686
+    },
+    {
+      "name": "IMD band = 0-10%",
+      "mean_abs": 0.020067747682332993
+    },
+    {
+      "name": "Disability = N",
+      "mean_abs": 0.018981482833623886
+    },
+    {
+      "name": "Age band = 35-55",
+      "mean_abs": 0.01872207783162594
+    },
+    {
+      "name": "IMD band = 10-20",
+      "mean_abs": 0.018065650016069412
+    },
+    {
+      "name": "IMD band = 90-100%",
+      "mean_abs": 0.017013434320688248
+    },
+    {
+      "name": "Region = Wales",
+      "mean_abs": 0.016755150631070137
+    },
+    {
+      "name": "Region = South Region",
+      "mean_abs": 0.015220621600747108
+    },
+    {
+      "name": "Region = North Western Region",
+      "mean_abs": 0.014424118213355541
+    },
+    {
+      "name": "Region = South West Region",
+      "mean_abs": 0.014183495193719864
+    },
+    {
+      "name": "Region = London Region",
+      "mean_abs": 0.013325121253728867
+    },
+    {
+      "name": "Region = South East Region",
+      "mean_abs": 0.011759435757994652
+    },
+    {
+      "name": "Region = West Midlands Region",
+      "mean_abs": 0.011520769447088242
+    },
+    {
+      "name": "IMD band = 20-30%",
+      "mean_abs": 0.011296555399894714
+    },
+    {
+      "name": "IMD band = Missing",
+      "mean_abs": 0.011284438893198967
+    },
+    {
+      "name": "Region = East Anglian Region",
+      "mean_abs": 0.010281717404723167
+    },
+    {
+      "name": "IMD band = 40-50%",
+      "mean_abs": 0.010049676522612572
+    },
+    {
+      "name": "Region = East Midlands Region",
+      "mean_abs": 0.009206188842654228
+    },
+    {
+      "name": "IMD band = 50-60%",
+      "mean_abs": 0.009121411480009556
+    },
+    {
+      "name": "IMD band = 60-70%",
+      "mean_abs": 0.008907819166779518
+    },
+    {
+      "name": "IMD band = 30-40%",
+      "mean_abs": 0.006627105176448822
+    },
+    {
+      "name": "Region = Ireland",
+      "mean_abs": 0.006410681176930666
+    },
+    {
+      "name": "IMD band = 70-80%",
+      "mean_abs": 0.00617608055472374
+    },
+    {
+      "name": "Region = North Region",
+      "mean_abs": 0.005653428845107555
+    },
+    {
+      "name": "Region = Yorkshire Region",
+      "mean_abs": 0.005367726553231478
+    },
+    {
+      "name": "Prior education = Post Graduate Qualification",
+      "mean_abs": 0.004608421120792627
+    },
+    {
+      "name": "Prior education = No Formal quals",
+      "mean_abs": 0.0024162516929209232
+    },
+    {
+      "name": "Age band = 55<=",
+      "mean_abs": 0.0016839352902024984
+    },
+    {
+      "name": "Disability = Y",
+      "mean_abs": 0.0
+    },
+    {
+      "name": "Gender = M",
+      "mean_abs": 0.0
+    }
+  ]
+}
