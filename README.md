@@ -61,7 +61,12 @@ python experiments/run_oulad.py              # ~5 min on a laptop
 python experiments/run_ednet.py              # ~15 min (reads sampled KT1 user files)
 python experiments/shap_analysis.py          # ~4 min
 python experiments/build_paper_artifacts.py  # regenerates all numbers/tables/figures
+python experiments/run_sweep.py              # optional: neural hyperparameter-sensitivity check
 ```
+
+The committed `results/hp_sweep.json` holds the 36-configuration neural
+sensitivity check reported in the manuscript's limitations (selection on
+validation macro-F1 only).
 
 Evaluation protocol (identical for every dataset, regime, and model):
 student-level 70/15/15 splits (no student in two splits), preprocessing fitted
