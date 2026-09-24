@@ -265,44 +265,114 @@ __FOOT__
 
 # ── figure 1: architecture ───────────────────────────────────────────────────
 def fig_architecture(ou):
-    fig, ax = plt.subplots(figsize=(9.2, 3.1))
-    ax.set_xlim(0, 100); ax.set_ylim(-2.4, 34); ax.axis("off")
-    ax.grid(False)
+    """Two-panel architecture figure: (a) staged fusion pipeline with the
+    pre-/post-cutoff split made explicit; (b) timeline semantics of the
+    prospective cut."""
+    n_par = get(ou, "oulad", "prospective", "BiLSTM-Attention")["params"]
+    bs = chr(92)  # backslash, built at runtime to sidestep escape cascading
+    TX = "$" + bs + "mathbf{X}" + "(" + bs + "tau)" + "$"
+    ARR = "$" + bs + "rightarrow$"
+    TAU = "$" + bs + "tau$"
 
-    def box(x, y, w, h, text, fc="#eef3fb", ec=BLUE, fs=8, dashed=False):
-        ax.add_patch(FancyBboxPatch((x, y), w, h, boxstyle="round,pad=0.4",
-                                    fc=fc, ec=ec, lw=1.1,
+    fig = plt.figure(figsize=(9.4, 5.0))
+    gs = fig.add_gridspec(2, 1, height_ratios=[1.5, 1.0], hspace=0.30,
+                          left=0.01, right=0.99, top=0.97, bottom=0.01)
+    ax = fig.add_subplot(gs[0]); ax.axis("off"); ax.grid(False)
+    ax.set_xlim(0, 130); ax.set_ylim(0, 46)
+
+    def box(x, y, w, h, text, fc="#ffffff", ec=GRAY, fs=7.4, lw=1.0, tc="#22221f",
+            dashed=False, bold=False):
+        ax.add_patch(FancyBboxPatch((x, y), w, h, boxstyle="round,pad=0.35",
+                                    fc=fc, ec=ec, lw=lw,
                                     linestyle="--" if dashed else "-"))
-        ax.text(x + w / 2, y + h / 2, text, ha="center", va="center", fontsize=fs)
+        ax.text(x + w / 2, y + h / 2, text, ha="center", va="center", fontsize=fs,
+                color=tc, fontweight="semibold" if bold else "normal", linespacing=1.3)
 
-    def arrow(x1, y1, x2, y2, color=GRAY, dashed=False):
-        ax.add_patch(FancyArrowPatch((x1, y1), (x2, y2), arrowstyle="-|>",
-                                     mutation_scale=9, color=color, lw=1.1,
+    def arrow(p1, p2, color=GRAY, dashed=False, lw=1.2, rad=0.0):
+        ax.add_patch(FancyArrowPatch(p1, p2, arrowstyle="-|>", mutation_scale=10,
+                                     color=color, lw=lw,
+                                     connectionstyle=f"arc3,rad={rad}",
                                      linestyle="--" if dashed else "-"))
 
-    sources = ["AMS\ngrades / credits", "LMS\ninteraction traces",
-               "SAS\ndemographics / attendance", "IUCP\nworkplace learning"]
-    y0 = 24
-    for i, s in enumerate(sources):
-        yy = y0 - i * 7.4
-        box(1, yy, 15, 6.2, s, fc="#f4f6f8", ec=GRAY)
-        arrow(16.4, yy + 3.1, 22.5, 17, color=GRAY)
-    box(23, 13, 16, 8, "per-source\nextractors\n(student, period) key")
-    box(44, 13, 14, 8, "partition-parallel\nmerge", fc="#eef3fb")
-    box(63, 13, 15, 8, "tensor constructor\n$X(\\tau)$ pre-cutoff\n$Y$ post-cutoff", fc="#eef3fb")
-    n_par = get(ou, "oulad", "prospective", "BiLSTM-Attention")["params"]
-    box(83, 20, 15, 7.2, f"BiLSTM-Attention\n({n_par/1000:.0f}K params)", fc="#f7f2fb", ec=VIOLET)
-    box(83, 5.5, 15, 7.2, "ordinal metrics +\nstudent bootstrap", fc="#f7f2fb", ec=VIOLET)
-    arrow(58.5, 17, 62.5, 17)
-    arrow(39.5, 17, 43.5, 17)
-    arrow(78.5, 17, 82.5, 21.5)
-    arrow(90.5, 19.5, 90.5, 13.2, color=VIOLET)
-    box(63, 1.5, 15, 6.4, "prospective cut gate\n$\\tau=0.3\\,|W|$ / $0.5\\,|W|$", fc="#fdf3f3", ec=RED, dashed=True)
-    arrow(70.5, 12.5, 70.5, 8.2, color=RED, dashed=True)
-    ax.text(70.5, -1.6, "label-defining signals join evaluation only, never training",
-            ha="center", fontsize=7.5, color=RED)
-    ax.text(50, 32.6, "multi-source fusion with an explicit prospective cut",
-            ha="center", fontsize=10.5)
+    def stage(x0, x1, label):
+        ax.add_patch(FancyBboxPatch((x0, 3.5), x1 - x0, 36, boxstyle="round,pad=0.2",
+                                    fc="#f6f7f9", ec="none", zorder=0))
+        ax.text((x0 + x1) / 2, 42.0, label, ha="center", va="center",
+                fontsize=7.0, color="#8a897f")
+
+    ax.text(2, 45.2, "(a)  multi-source fusion pipeline with an explicit prospective cut",
+            fontsize=8.2, color="#22221f", va="center")
+    stage(19, 36, "EXTRACT"); stage(38, 56, "INTEGRATE")
+    stage(58, 76, "CONSTRUCT"); stage(78, 103, "MODEL"); stage(105, 128, "EVALUATE")
+    ax.text(9.5, 42.0, "SOURCES", ha="center", fontsize=7.0, color="#8a897f")
+
+    src = [("AMS", "grades · credits"), ("LMS", "interactions"),
+           ("SAS", "demographics ·\nattendance"), ("IUCP", "workplace\nlearning")]
+    for i, (t1, t2) in enumerate(src):
+        y = 32.5 - i * 9.6
+        box(3, y, 13, 7.8, t1 + "\n" + t2, fc="#f4f6f8", fs=7.0)
+        arrow((16.4, y + 3.9), (21.4, 22.0))
+
+    box(22, 15.5, 12.5, 13, "per-source\nextractors\n\nkey (student, period)", fs=7.2)
+    box(40, 15.5, 14, 13, "partition-parallel\nmerge", fc="#eef3fb", ec=BLUE, bold=True)
+    box(42, 8.2, 10, 4.4, "manifest gate", fc="#ffffff", ec="#c9c8bf", fs=6.2, dashed=True)
+    ax.text(47, 5.4, "idempotent · failure-tolerant", ha="center", fontsize=6.0, color="#8a897f")
+
+    box(60, 15.5, 14, 13, "tensor\nconstructor", fc="#eef3fb", ec=BLUE, bold=True)
+
+    box(80, 30, 23, 10, "training tensor " + TX + "\npre-cutoff signals only",
+        fc="#e8f1fc", ec=BLUE, fs=7.3, tc="#1b4c8f", bold=True)
+    box(80, 4.5, 23, 10, "outcome table $Y$\npost-cutoff · label-defining",
+        fc="#fdf0f0", ec=RED, fs=7.3, tc="#8f2323", bold=True)
+    ax.text(91.5, 27.6, "pre-cutoff", ha="center", fontsize=6.3, color=BLUE)
+    ax.text(91.5, 16.9, "post-cutoff", ha="center", fontsize=6.3, color=RED)
+    arrow((74.4, 25), (79.6, 33), color=BLUE)
+    arrow((74.4, 19), (79.6, 9.5), color=RED)
+
+    box(105, 30, 23, 10, "flat + temporal models\nBiLSTM-Attention\n(%dK parameters)" % round(n_par / 1000),
+        fc="#f4f0fb", ec=VIOLET, fs=7.0, tc="#3a2a80", bold=True)
+    box(105, 4.5, 23, 10, "ordinal metrics +\nstudent-level bootstrap",
+        fc="#f4f0fb", ec=VIOLET, fs=7.2, tc="#3a2a80")
+    arrow((103.4, 35), (104.6, 35), color=BLUE)
+    arrow((116.5, 29.8), (116.5, 14.7), color=VIOLET)
+    arrow((103.4, 9.5), (104.6, 9.5), color=RED, dashed=True)
+    ax.text(91.5, 2.2, "joined at evaluation only — never enters training",
+            ha="center", fontsize=6.3, color=RED)
+
+    # panel (b): timeline semantics
+    bx = fig.add_subplot(gs[1]); bx.axis("off"); bx.grid(False)
+    bx.set_xlim(0, 130); bx.set_ylim(0, 40)
+    bx.text(2, 36, "(b)  temporal semantics of the prospective cut", fontsize=8.2,
+            color="#22221f", va="center")
+    y0, h = 15, 9
+    bx.add_patch(FancyBboxPatch((10, y0), 52, h, boxstyle="round,pad=0.2",
+                                fc="#dbe9fb", ec=BLUE, lw=1.0))
+    bx.add_patch(FancyBboxPatch((62, y0), 58, h, boxstyle="round,pad=0.2",
+                                fc="#fce4e4", ec=RED, lw=1.0))
+    bx.text(36, y0 + h / 2 + 1.6,
+            "feature window $[0," + bs + "," + bs + "tau" + "]$  " + ARR + "  " + TX,
+            ha="center", fontsize=8, color="#1b4c8f")
+    bx.text(36, y0 + h / 2 - 1.9, "activity signals · early assessments",
+            ha="center", fontsize=6.8, color="#40699c")
+    bx.text(91, y0 + h / 2 + 1.6,
+            "labelled period $(" + bs + "tau" + "," + bs + "," + "|W|]$  " + ARR + "  $Y$",
+            ha="center", fontsize=8, color="#8f2323")
+    bx.text(91, y0 + h / 2 - 1.9, "label-defining: grades · failures · attendance",
+            ha="center", fontsize=6.8, color="#a45252")
+    for x, lab in ((22, "TMA 1"), (40, "TMA 2"), (55, "TMA 3"), (112, "final exam")):
+        inside = x < 62
+        bx.plot([x], [y0 + h / 2], marker="o", ms=4.5, mfc="white",
+                mec=BLUE if inside else RED, mew=1.2, zorder=5)
+        bx.text(x, y0 + h + 1.8, lab, ha="center", fontsize=6.2,
+                color=BLUE if inside else "#a45252")
+    bx.plot([62, 62], [y0 - 3.2, y0 + h + 4.4], color=RED, lw=2.2)
+    bx.plot([62], [y0 + h + 4.8], marker="v", ms=5, color=RED)
+    bx.text(64.5, y0 + h + 6.6, "prospective cut " + TAU, fontsize=7.6, color=RED, va="center")
+    bx.text(10, y0 - 5.4, "$t=0$", fontsize=7, color=GRAY, ha="left")
+    bx.text(120, y0 - 5.4, "$t=|W|$", fontsize=7, color=GRAY, ha="right")
+    bx.text(36, y0 - 5.4, "model sees only this side", fontsize=6.6, color="#40699c", ha="center")
+    bx.text(91, y0 - 5.4, "joined only at evaluation", fontsize=6.6, color="#a45252", ha="center")
+
     fig.savefig(os.path.join(FIG, "fig1_architecture.pdf"), bbox_inches="tight")
     plt.close(fig)
 
