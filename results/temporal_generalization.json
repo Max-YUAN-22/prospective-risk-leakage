@@ -1,0 +1,76 @@
+{
+  "summary": {
+    "XGBoost": {
+      "gap_acc": 0.077,
+      "gap_qwk": 0.143
+    },
+    "LSTM": {
+      "gap_acc": 0.159,
+      "gap_qwk": 0.172
+    },
+    "BiLSTM-Attention": {
+      "gap_acc": 0.136,
+      "gap_qwk": 0.177
+    }
+  },
+  "results": {
+    "prospective": {
+      "XGBoost": {
+        "n": 19064,
+        "accuracy": 0.5725451112043642,
+        "macro_f1": 0.5081023562654026,
+        "mae": 0.5099139739823751,
+        "qwk": 0.63289777327225,
+        "one_off_accuracy": 0.9210029374737726,
+        "severe_underestimation": 0.061949223667645825
+      },
+      "LSTM": {
+        "n": 19064,
+        "accuracy": 0.5265421737305916,
+        "macro_f1": 0.5198426443709938,
+        "mae": 0.550986151909358,
+        "qwk": 0.6666058371430514,
+        "one_off_accuracy": 0.9353231221149811,
+        "severe_underestimation": 0.051668065463701215
+      },
+      "BiLSTM-Attention": {
+        "n": 19064,
+        "accuracy": 0.5302664708350818,
+        "macro_f1": 0.523017124164161,
+        "mae": 0.5561791859001259,
+        "qwk": 0.6581084298456339,
+        "one_off_accuracy": 0.9291859001258918,
+        "severe_underestimation": 0.06042803189257239
+      }
+    },
+    "contemporaneous": {
+      "XGBoost": {
+        "n": 19064,
+        "accuracy": 0.6491817037347881,
+        "macro_f1": 0.6021561933777982,
+        "mae": 0.37358371800251783,
+        "qwk": 0.7762694977963422,
+        "one_off_accuracy": 0.9792803189257239,
+        "severe_underestimation": 0.005350398657154847
+      },
+      "LSTM": {
+        "n": 19064,
+        "accuracy": 0.6858476710029374,
+        "macro_f1": 0.6577170759610176,
+        "mae": 0.32453839697859843,
+        "qwk": 0.838610294547534,
+        "one_off_accuracy": 0.990925304238355,
+        "severe_underestimation": 0.0055602182123373894
+      },
+      "BiLSTM-Attention": {
+        "n": 19064,
+        "accuracy": 0.6664393621485523,
+        "macro_f1": 0.6485733487973847,
+        "mae": 0.34074695761644985,
+        "qwk": 0.835225116131608,
+        "one_off_accuracy": 0.9936529584557281,
+        "severe_underestimation": 0.003986571548468317
+      }
+    }
+  }
+}
