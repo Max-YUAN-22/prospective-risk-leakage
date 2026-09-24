@@ -1,0 +1,272 @@
+{
+  "summary": {
+    "LogisticRegression": {
+      "window_extension_acc": 0.088,
+      "leakage_step_acc": 0.002,
+      "window_extension_qwk": 0.196,
+      "leakage_step_qwk": 0.002,
+      "total_cont30_to_cont90_acc": 0.091
+    },
+    "RandomForest": {
+      "window_extension_acc": 0.069,
+      "leakage_step_acc": 0.011,
+      "window_extension_qwk": 0.133,
+      "leakage_step_qwk": 0.006,
+      "total_cont30_to_cont90_acc": 0.08
+    },
+    "GradientBoosting": {
+      "window_extension_acc": 0.071,
+      "leakage_step_acc": 0.007,
+      "window_extension_qwk": 0.129,
+      "leakage_step_qwk": 0.004,
+      "total_cont30_to_cont90_acc": 0.078
+    },
+    "XGBoost": {
+      "window_extension_acc": 0.07,
+      "leakage_step_acc": 0.006,
+      "window_extension_qwk": 0.133,
+      "leakage_step_qwk": 0.003,
+      "total_cont30_to_cont90_acc": 0.077
+    },
+    "LSTM": {
+      "window_extension_acc": 0.104,
+      "leakage_step_acc": 0.012,
+      "window_extension_qwk": 0.152,
+      "leakage_step_qwk": -0.001,
+      "total_cont30_to_cont90_acc": 0.116
+    },
+    "BiLSTM-Attention": {
+      "window_extension_acc": 0.107,
+      "leakage_step_acc": 0.017,
+      "window_extension_qwk": 0.167,
+      "leakage_step_qwk": 0.009,
+      "total_cont30_to_cont90_acc": 0.124
+    }
+  },
+  "results": {
+    "clean30": {
+      "LogisticRegression": {
+        "n": 4906,
+        "accuracy": 0.5758255197717081,
+        "macro_f1": 0.4497025220086399,
+        "mae": 0.5450468813697513,
+        "qwk": 0.5781017480822674,
+        "one_off_accuracy": 0.8860578883000407,
+        "severe_underestimation": 0.07399103139013453
+      },
+      "RandomForest": {
+        "n": 4906,
+        "accuracy": 0.6206685690990623,
+        "macro_f1": 0.505417552895433,
+        "mae": 0.4612719119445577,
+        "qwk": 0.6626463260404354,
+        "one_off_accuracy": 0.9186710150835712,
+        "severe_underestimation": 0.07276803913575214
+      },
+      "GradientBoosting": {
+        "n": 4906,
+        "accuracy": 0.6174072564207094,
+        "macro_f1": 0.5241610705115545,
+        "mae": 0.46167957602935183,
+        "qwk": 0.6696254668760895,
+        "one_off_accuracy": 0.9225438238891154,
+        "severe_underestimation": 0.06787607011822258
+      },
+      "XGBoost": {
+        "n": 4906,
+        "accuracy": 0.6143497757847534,
+        "macro_f1": 0.526976419079622,
+        "mae": 0.4667753770892784,
+        "qwk": 0.6670428157445256,
+        "one_off_accuracy": 0.92152466367713,
+        "severe_underestimation": 0.06604158173664901
+      },
+      "LSTM": {
+        "n": 4906,
+        "accuracy": 0.5674684060334284,
+        "macro_f1": 0.5524147703629089,
+        "mae": 0.5101916021198533,
+        "qwk": 0.6845965538264064,
+        "one_off_accuracy": 0.9349775784753364,
+        "severe_underestimation": 0.061557276803913576
+      },
+      "BiLSTM-Attention": {
+        "n": 4906,
+        "accuracy": 0.5709335507541785,
+        "macro_f1": 0.5529153002364569,
+        "mae": 0.5144720750101917,
+        "qwk": 0.6747176333654706,
+        "one_off_accuracy": 0.9290664492458215,
+        "severe_underestimation": 0.06604158173664901
+      }
+    },
+    "cont30": {
+      "LogisticRegression": {
+        "n": 4906,
+        "accuracy": 0.5813289849164288,
+        "macro_f1": 0.4709468886097826,
+        "mae": 0.5391357521402365,
+        "qwk": 0.5856742172953495,
+        "one_off_accuracy": 0.8864655523848349,
+        "severe_underestimation": 0.07378719934773746
+      },
+      "RandomForest": {
+        "n": 4906,
+        "accuracy": 0.6290256828373421,
+        "macro_f1": 0.5218867335679869,
+        "mae": 0.449653485527925,
+        "qwk": 0.6745333338543478,
+        "one_off_accuracy": 0.9223399918467183,
+        "severe_underestimation": 0.07052588666938443
+      },
+      "GradientBoosting": {
+        "n": 4906,
+        "accuracy": 0.6347329800244599,
+        "macro_f1": 0.549666312250151,
+        "mae": 0.4390542193232776,
+        "qwk": 0.688434222412095,
+        "one_off_accuracy": 0.9278434569914391,
+        "severe_underestimation": 0.06441092539747248
+      },
+      "XGBoost": {
+        "n": 4906,
+        "accuracy": 0.6280065226253567,
+        "macro_f1": 0.5529997041408765,
+        "mae": 0.4484304932735426,
+        "qwk": 0.6852736267325062,
+        "one_off_accuracy": 0.9260089686098655,
+        "severe_underestimation": 0.06359559722788423
+      },
+      "LSTM": {
+        "n": 4906,
+        "accuracy": 0.5782715042804729,
+        "macro_f1": 0.5609685343685007,
+        "mae": 0.5036689767631471,
+        "qwk": 0.6876166038293424,
+        "one_off_accuracy": 0.9321239298817774,
+        "severe_underestimation": 0.06237260497350183
+      },
+      "BiLSTM-Attention": {
+        "n": 4906,
+        "accuracy": 0.5809213208316347,
+        "macro_f1": 0.5630139343190567,
+        "mae": 0.5008153281695883,
+        "qwk": 0.6847462095751463,
+        "one_off_accuracy": 0.930697105584998,
+        "severe_underestimation": 0.06216877293110477
+      }
+    },
+    "clean90": {
+      "LogisticRegression": {
+        "n": 4906,
+        "accuracy": 0.6642886261720342,
+        "macro_f1": 0.5787418312825244,
+        "mae": 0.3721973094170404,
+        "qwk": 0.7737524670859736,
+        "one_off_accuracy": 0.965348552792499,
+        "severe_underestimation": 0.026090501426824297
+      },
+      "RandomForest": {
+        "n": 4906,
+        "accuracy": 0.6899714635140645,
+        "macro_f1": 0.6048266819019583,
+        "mae": 0.34284549531186304,
+        "qwk": 0.7951785136859219,
+        "one_off_accuracy": 0.9677945373012637,
+        "severe_underestimation": 0.02588666938442723
+      },
+      "GradientBoosting": {
+        "n": 4906,
+        "accuracy": 0.6879331430900938,
+        "macro_f1": 0.6200296811419145,
+        "mae": 0.34141867101508355,
+        "qwk": 0.7990606828581105,
+        "one_off_accuracy": 0.9714635140644109,
+        "severe_underestimation": 0.02242152466367713
+      },
+      "XGBoost": {
+        "n": 4906,
+        "accuracy": 0.6846718304117407,
+        "macro_f1": 0.6181484760897912,
+        "mae": 0.3424378312270689,
+        "qwk": 0.8004590232977392,
+        "one_off_accuracy": 0.9732980024459845,
+        "severe_underestimation": 0.020383204239706482
+      },
+      "LSTM": {
+        "n": 4906,
+        "accuracy": 0.6710150835711374,
+        "macro_f1": 0.6472476287387358,
+        "mae": 0.336526701997554,
+        "qwk": 0.8366844899482629,
+        "one_off_accuracy": 0.9928658785161028,
+        "severe_underestimation": 0.00550346514472075
+      },
+      "BiLSTM-Attention": {
+        "n": 4906,
+        "accuracy": 0.6777415409702405,
+        "macro_f1": 0.650958290700814,
+        "mae": 0.33041174072564206,
+        "qwk": 0.841538062779158,
+        "one_off_accuracy": 0.9920505503465145,
+        "severe_underestimation": 0.006522625356706074
+      }
+    },
+    "cont90": {
+      "LogisticRegression": {
+        "n": 4906,
+        "accuracy": 0.6663269465960049,
+        "macro_f1": 0.5812768658962204,
+        "mae": 0.36995515695067266,
+        "qwk": 0.7758793408066247,
+        "one_off_accuracy": 0.965348552792499,
+        "severe_underestimation": 0.026294333469221363
+      },
+      "RandomForest": {
+        "n": 4906,
+        "accuracy": 0.7007745617611089,
+        "macro_f1": 0.6194412557733809,
+        "mae": 0.33163473298002444,
+        "qwk": 0.8010797098389026,
+        "one_off_accuracy": 0.9679983693436608,
+        "severe_underestimation": 0.026090501426824297
+      },
+      "GradientBoosting": {
+        "n": 4906,
+        "accuracy": 0.6952710966163881,
+        "macro_f1": 0.6298173020190112,
+        "mae": 0.33408071748878926,
+        "qwk": 0.8029444032470566,
+        "one_off_accuracy": 0.9718711781492051,
+        "severe_underestimation": 0.02242152466367713
+      },
+      "XGBoost": {
+        "n": 4906,
+        "accuracy": 0.6909906237260497,
+        "macro_f1": 0.6306760923851327,
+        "mae": 0.33673053403995107,
+        "qwk": 0.80389475115854,
+        "one_off_accuracy": 0.9726865063187933,
+        "severe_underestimation": 0.02119853240929474
+      },
+      "LSTM": {
+        "n": 4906,
+        "accuracy": 0.6830411740725643,
+        "macro_f1": 0.6605308266820984,
+        "mae": 0.3245006114961272,
+        "qwk": 0.8356927281935679,
+        "one_off_accuracy": 0.9926620464737057,
+        "severe_underestimation": 0.006318793314309009
+      },
+      "BiLSTM-Attention": {
+        "n": 4906,
+        "accuracy": 0.6944557684467998,
+        "macro_f1": 0.6630473729881633,
+        "mae": 0.31247452099470036,
+        "qwk": 0.8505999033801925,
+        "one_off_accuracy": 0.9932735426008968,
+        "severe_underestimation": 0.00550346514472075
+      }
+    }
+  }
+}

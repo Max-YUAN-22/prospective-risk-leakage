@@ -121,17 +121,21 @@ def assessment_features(df):
     out = []
     for enrol, g in asx.groupby("enrol_id", sort=False):
         cutoff = int(g.cutoff_day.iloc[0])
-        early = g[g.date <= cutoff]
-        exams = g[g.assessment_type == "Exam"]
+        length = int(g.module_presentation_length.iloc[0])
+        # strict availability: a score exists at time t only if its recorded
+        # submission date is no later than t.
+        early = g[(g.date <= cutoff) & (g.date_submitted <= cutoff)]
+        full = g[g.date_submitted <= length]
+        exams = full[full.assessment_type == "Exam"]
         r = {"enrol_id": enrol,
              "n_submitted_early": len(early),
              "mean_score_early": early.score.mean() if len(early) else np.nan,
              "min_score_early": early.score.min() if len(early) else np.nan,
              "any_missing_early": float(len(early) < 1),
-             "n_submitted_full": len(g),
-             "mean_score_full": g.score.mean(),
-             "min_score_full": g.score.min(),
-             "max_score_full": g.score.max(),
+             "n_submitted_full": len(full),
+             "mean_score_full": full.score.mean(),
+             "min_score_full": full.score.min(),
+             "max_score_full": full.score.max(),
              "exam_score": float(exams.score.iloc[0]) if len(exams) else np.nan}
         out.append(r)
     asx = df[["enrol_id"]].merge(pd.DataFrame(out), on="enrol_id", how="left")

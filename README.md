@@ -62,6 +62,8 @@ python experiments/run_ednet.py              # ~15 min (reads sampled KT1 user f
 python experiments/shap_analysis.py          # ~4 min
 python experiments/build_paper_artifacts.py  # regenerates all numbers/tables/figures
 python experiments/run_sweep.py              # optional: neural hyperparameter-sensitivity check
+python experiments/run_matched_leakage.py    # optional: matched-window leakage decomposition (paper Table 4)
+python experiments/export_ednet_sample.py    # optional: re-pin the EdNet sample
 python experiments/run_dose_response.py      # optional: leakage dose-response curve (fig 3 of the paper)
 python experiments/run_label_ordering.py     # optional: label-ordering sensitivity check
 python experiments/export_ednet_sample.py    # optional: re-pin the 24,736-user EdNet sample
@@ -71,6 +73,8 @@ The committed `results/hp_sweep.json` holds the 36-configuration neural
 sensitivity check reported in the manuscript's limitations (selection on
 validation macro-F1 only), and `results/ednet_sample_uids.csv` pins the exact
 24,736-user EdNet-KT1 sample so the cohort is reproducible byte-for-byte.
+`results/matched_leakage.json` (matched-window decomposition, Table 4),
+`results/supplementary_cis.csv` (bootstrap CIs for every metric x model x regime),
 `results/dose_response.json` (leakage dose-response, fig 3) and
 `results/ordering_sensitivity.json` (alternative label ordering) support the
 robustness analyses in Sections 6.2 and 8.

@@ -7,186 +7,186 @@
   "features": [
     {
       "name": "Assessments submitted (early)",
-      "mean_abs": 0.8116015195846558
+      "mean_abs": 0.7710657119750977
     },
     {
       "name": "Mean assessment score (early)",
-      "mean_abs": 0.516553521156311
+      "mean_abs": 0.5200889706611633
     },
     {
       "name": "Active days (early)",
-      "mean_abs": 0.21620503067970276
+      "mean_abs": 0.21473440527915955
     },
     {
       "name": "Min assessment score (early)",
-      "mean_abs": 0.18776433169841766
-    },
-    {
-      "name": "Daily-click SD (early)",
-      "mean_abs": 0.13782373070716858
+      "mean_abs": 0.18230661749839783
     },
     {
       "name": "Clicks (early window)",
-      "mean_abs": 0.12798286974430084
+      "mean_abs": 0.14622876048088074
+    },
+    {
+      "name": "Daily-click SD (early)",
+      "mean_abs": 0.1373911052942276
     },
     {
       "name": "Studied credits",
-      "mean_abs": 0.12313525378704071
+      "mean_abs": 0.1251211166381836
     },
     {
       "name": "Prior education = Lower Than A Level",
-      "mean_abs": 0.09323685616254807
+      "mean_abs": 0.09196195006370544
     },
     {
       "name": "Mean daily clicks (early)",
-      "mean_abs": 0.08256468921899796
+      "mean_abs": 0.08752240985631943
     },
     {
       "name": "No early assessment (flag)",
-      "mean_abs": 0.06261514127254486
+      "mean_abs": 0.0737680196762085
     },
     {
       "name": "Gender = F",
-      "mean_abs": 0.05163392797112465
+      "mean_abs": 0.05140632390975952
     },
     {
       "name": "Previous attempts",
-      "mean_abs": 0.050763003528118134
-    },
-    {
-      "name": "Region = Scotland",
-      "mean_abs": 0.024050917476415634
-    },
-    {
-      "name": "Prior education = A Level or Equivalent",
-      "mean_abs": 0.0225874874740839
+      "mean_abs": 0.050068214535713196
     },
     {
       "name": "Age band = 0-35",
-      "mean_abs": 0.022584112361073494
+      "mean_abs": 0.026263287290930748
     },
     {
-      "name": "IMD band = 80-90%",
-      "mean_abs": 0.021989552304148674
+      "name": "Prior education = A Level or Equivalent",
+      "mean_abs": 0.02397262677550316
     },
     {
-      "name": "Prior education = HE Qualification",
-      "mean_abs": 0.020855771377682686
+      "name": "Region = Scotland",
+      "mean_abs": 0.0239079799503088
     },
     {
       "name": "IMD band = 0-10%",
-      "mean_abs": 0.020067747682332993
+      "mean_abs": 0.020950132980942726
     },
     {
       "name": "Disability = N",
-      "mean_abs": 0.018981482833623886
+      "mean_abs": 0.020857030525803566
     },
     {
-      "name": "Age band = 35-55",
-      "mean_abs": 0.01872207783162594
+      "name": "Prior education = HE Qualification",
+      "mean_abs": 0.01954537071287632
+    },
+    {
+      "name": "IMD band = 80-90%",
+      "mean_abs": 0.01939934492111206
     },
     {
       "name": "IMD band = 10-20",
-      "mean_abs": 0.018065650016069412
+      "mean_abs": 0.01762939989566803
+    },
+    {
+      "name": "Age band = 35-55",
+      "mean_abs": 0.017306102439761162
     },
     {
       "name": "IMD band = 90-100%",
-      "mean_abs": 0.017013434320688248
+      "mean_abs": 0.017043374478816986
     },
     {
       "name": "Region = Wales",
-      "mean_abs": 0.016755150631070137
+      "mean_abs": 0.014902015216648579
     },
     {
       "name": "Region = South Region",
-      "mean_abs": 0.015220621600747108
-    },
-    {
-      "name": "Region = North Western Region",
-      "mean_abs": 0.014424118213355541
-    },
-    {
-      "name": "Region = South West Region",
-      "mean_abs": 0.014183495193719864
-    },
-    {
-      "name": "Region = London Region",
-      "mean_abs": 0.013325121253728867
-    },
-    {
-      "name": "Region = South East Region",
-      "mean_abs": 0.011759435757994652
-    },
-    {
-      "name": "Region = West Midlands Region",
-      "mean_abs": 0.011520769447088242
+      "mean_abs": 0.014423063024878502
     },
     {
       "name": "IMD band = 20-30%",
-      "mean_abs": 0.011296555399894714
+      "mean_abs": 0.013218039646744728
+    },
+    {
+      "name": "Region = North Western Region",
+      "mean_abs": 0.013142362236976624
+    },
+    {
+      "name": "Region = London Region",
+      "mean_abs": 0.01200175378471613
+    },
+    {
+      "name": "Region = West Midlands Region",
+      "mean_abs": 0.011822549626231194
+    },
+    {
+      "name": "Region = South East Region",
+      "mean_abs": 0.01149308867752552
     },
     {
       "name": "IMD band = Missing",
-      "mean_abs": 0.011284438893198967
+      "mean_abs": 0.011147283017635345
     },
     {
-      "name": "Region = East Anglian Region",
-      "mean_abs": 0.010281717404723167
-    },
-    {
-      "name": "IMD band = 40-50%",
-      "mean_abs": 0.010049676522612572
-    },
-    {
-      "name": "Region = East Midlands Region",
-      "mean_abs": 0.009206188842654228
-    },
-    {
-      "name": "IMD band = 50-60%",
-      "mean_abs": 0.009121411480009556
+      "name": "Region = South West Region",
+      "mean_abs": 0.010788364335894585
     },
     {
       "name": "IMD band = 60-70%",
-      "mean_abs": 0.008907819166779518
+      "mean_abs": 0.00987422838807106
+    },
+    {
+      "name": "IMD band = 40-50%",
+      "mean_abs": 0.009576999582350254
+    },
+    {
+      "name": "Region = East Anglian Region",
+      "mean_abs": 0.009376049041748047
     },
     {
       "name": "IMD band = 30-40%",
-      "mean_abs": 0.006627105176448822
+      "mean_abs": 0.009187517687678337
+    },
+    {
+      "name": "Region = East Midlands Region",
+      "mean_abs": 0.008592916652560234
+    },
+    {
+      "name": "IMD band = 50-60%",
+      "mean_abs": 0.007534324657171965
     },
     {
       "name": "Region = Ireland",
-      "mean_abs": 0.006410681176930666
+      "mean_abs": 0.0073457928374409676
     },
     {
       "name": "IMD band = 70-80%",
-      "mean_abs": 0.00617608055472374
+      "mean_abs": 0.0051806592382490635
     },
     {
       "name": "Region = North Region",
-      "mean_abs": 0.005653428845107555
-    },
-    {
-      "name": "Region = Yorkshire Region",
-      "mean_abs": 0.005367726553231478
+      "mean_abs": 0.004953373223543167
     },
     {
       "name": "Prior education = Post Graduate Qualification",
-      "mean_abs": 0.004608421120792627
+      "mean_abs": 0.004326456692069769
+    },
+    {
+      "name": "Region = Yorkshire Region",
+      "mean_abs": 0.003711068071424961
     },
     {
       "name": "Prior education = No Formal quals",
-      "mean_abs": 0.0024162516929209232
+      "mean_abs": 0.0019575958140194416
     },
     {
       "name": "Age band = 55<=",
-      "mean_abs": 0.0016839352902024984
-    },
-    {
-      "name": "Disability = Y",
-      "mean_abs": 0.0
+      "mean_abs": 0.0017615135293453932
     },
     {
       "name": "Gender = M",
+      "mean_abs": 0.0
+    },
+    {
+      "name": "Disability = Y",
       "mean_abs": 0.0
     }
   ]
