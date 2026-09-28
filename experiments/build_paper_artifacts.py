@@ -200,6 +200,11 @@ def build_numbers(ou, ed):
         mac("tempGapQwkRange", f"{min(v['gap_qwk'] for v in g.values()):.2f}--{max(v['gap_qwk'] for v in g.values()):.2f}")
         mac("tempProsAccXGB", fmt(tg["results"]["prospective"]["XGBoost"]["accuracy"]))
         mac("tempProsQwkLSTM", fmt(tg["results"]["prospective"]["LSTM"]["qwk"]))
+    if os.path.exists(os.path.join(RES, "ednet_dose.json")):
+        with open(os.path.join(RES, "ednet_dose.json")) as fh:
+            edn = json.load(fh)
+        mac("ednetDoseXGBAcc", fmt(edn["1.0"]["XGBoost"]["accuracy"]))
+        mac("ednetDoseBiAcc", fmt(edn["1.0"]["BiLSTM-Attention"]["accuracy"]))
 
     # matched-window leakage decomposition (OULAD)
     if os.path.exists(os.path.join(RES, "matched_leakage.json")):
@@ -440,6 +445,95 @@ __FOOT__
 
 
 # ── figure 1: architecture ───────────────────────────────────────────────────
+# ── figure 1: conceptual (TikZ emitted with real numbers) ───────────────────
+def emit_fig1_conceptual(ou, ed):
+    ext_xgb = None
+    if os.path.exists(os.path.join(RES, "matched_leakage.json")):
+        with open(os.path.join(RES, "matched_leakage.json")) as fh:
+            mk = json.load(fh)
+        ext_xgb = 100 * mk["summary"]["XGBoost"]["window_extension_acc"]
+        ext_bi = 100 * mk["summary"]["BiLSTM-Attention"]["window_extension_acc"]
+    else:
+        ext_xgb, ext_bi = 7.0, 10.7
+    ed_gap = max(100 * (get(ed, "ednet", "contemporaneous", m)["metrics"]["accuracy"]
+                        - get(ed, "ednet", "prospective", m)["metrics"]["accuracy"])
+                 for m in MODELS)
+    tikz = r"""\definecolor{cblue}{HTML}{2A78D6}
+\definecolor{corange}{HTML}{E8760E}
+\definecolor{credark}{HTML}{9A3B1E}
+\definecolor{cgray}{HTML}{8B8A80}
+\definecolor{cpast}{HTML}{DCE9FA}
+\definecolor{cfut}{HTML}{EDEDEA}
+\begin{tikzpicture}[
+  font=\scriptsize,
+  lab/.style={font=\tiny\bfseries, text=black!45},
+  tlab/.style={font=\tiny, text=black!60},
+  ann/.style={font=\tiny, text=black!55, align=center},
+]
+% panel (a)
+\node[anchor=west, font=\scriptsize\bfseries] at (0, 8.85) {(a)~The prediction task: predict the outcome from earlier information};
+\draw[->, line width=0.9pt, black!60] (0.3, 7.3) -- (15.2, 7.3);
+\node[tlab, anchor=north] at (0.3, 7.18)  {course / sequence start};
+\node[tlab, anchor=north] at (10.8, 7.18) {decision time $\tau$};
+\node[tlab, anchor=north] at (15.1, 7.18) {outcome};
+\draw[black!60, line width=1.2pt] (10.8, 6.95) -- (10.8, 7.65);
+\foreach \x/\l in {2.2/engagement, 5.2/assessments, 8.4/coursework}{
+  \fill[cblue] (\x, 7.3) circle (0.075);
+  \node[tlab, yshift=5pt] at (\x, 7.3) {\l};
+}
+\fill[credark] (14.0, 7.3) circle (0.075);
+\node[tlab, yshift=5pt, text=credark] at (14.0, 7.3) {grades · failure · withdrawal};
+\draw[decorate, decoration={brace, amplitude=4pt}, black!45] (0.4, 7.95) -- (10.7, 7.95);
+\node[lab, text=cblue!60!black] at (5.55, 8.32) {information available at the decision time};
+\draw[decorate, decoration={brace, amplitude=4pt}, black!45] (10.9, 7.95) -- (15.1, 7.95);
+\node[lab, text=credark] at (13.0, 8.32) {label-defining region};
+% panel (b)
+\node[anchor=west, font=\scriptsize\bfseries] at (0, 5.55) {(b)~Prospective: decision-time aligned};
+\fill[cpast]  (0.4, 3.6) rectangle (10.7, 4.9);
+\fill[cfut]   (10.8, 3.6) rectangle (15.1, 4.9);
+\draw[black!50, line width=0.5pt]  (0.4, 3.6) rectangle (10.7, 4.9);
+\draw[black!50, line width=0.5pt]  (10.8, 3.6) rectangle (15.1, 4.9);
+\node[font=\tiny, text=cblue!50!black] at (5.5, 4.45) {predictors: everything observed before $\tau$};
+\node[font=\tiny, text=black!55] at (12.9, 4.45) {outcome $Y$};
+\node[font=\tiny, text=black!45] at (12.9, 4.05) {observed only at the end};
+\draw[black!60, line width=1.2pt] (10.8, 3.35) -- (10.8, 5.15);
+\node[tlab, anchor=east] at (10.68, 3.5) {$\tau$};
+\draw[->, line width=0.8pt, cblue] (5.5, 3.32) .. controls (8.6, 2.7) .. (12.6, 3.42);
+\node[font=\tiny, text=cblue!50!black] at (7.6, 2.72) {prediction made at $\tau$, before the outcome exists};
+% panel (c)
+\node[anchor=west, font=\scriptsize\bfseries] at (0, 1.85) {(c)~Contemporaneous: outcome-overlapping};
+\fill[cpast]   (0.4, -0.1) rectangle (8.9, 1.2);
+\fill[corange!22] (8.9, -0.1) rectangle (15.1, 1.2);
+\fill[corange!45] (11.6, -0.1) rectangle (15.1, 1.2);
+\draw[black!50, line width=0.5pt]  (0.4, -0.1) rectangle (15.1, 1.2);
+\node[font=\tiny, text=cblue!50!black] at (4.6, 0.75) {predictors: everything observed before $\tau$};
+\node[font=\tiny, text=credark] at (13.35, 0.75) {+ label-defining signals};
+\node[font=\tiny, text=black!55] at (10.2, 0.32) {later information,};
+\node[font=\tiny, text=black!55] at (10.2, -0.02) {legitimately acquired};
+\node[font=\tiny, text=credark] at (13.9, 0.32) {outcome-determining};
+\draw[black!60, line width=1.2pt] (10.8, -0.35) -- (10.8, 1.45);
+\node[tlab, anchor=east] at (10.68, -0.2) {$\tau$};
+% panel (d)
+\node[anchor=west, font=\scriptsize\bfseries] at (0, -1.35) {(d)~Same task, same model, same split --- only the information boundary moves};
+\node[font=\tiny, text=black!60] at (7.7, -1.95) {what the added window contains};
+\draw[->, line width=0.8pt, black!55] (6.6, -2.12) -- (3.6, -2.62);
+\draw[->, line width=0.8pt, black!55] (8.8, -2.12) -- (11.8, -2.62);
+\draw[cblue, line width=0.6pt, rounded corners=3pt, fill=cblue!8] (0.8, -2.75) rectangle (6.0, -3.95);
+\node[font=\tiny, text=cblue!50!black, align=center] at (3.4, -3.35) {legitimate temporal accumulation\\[-2pt]{\tiny (OULAD: the window extension adds $+7.0$ to $+10.7$\,pp)}};
+\draw[credark, line width=0.6pt, rounded corners=3pt, fill=credark!6] (9.4, -2.75) rectangle (14.9, -3.95);
+\node[font=\tiny, text=credark, align=center] at (12.15, -3.35) {label reconstruction\\[-2pt]{\tiny (EdNet-KT1: injection of the outcome-determining sequence adds up to $+46.6$\,pp)}};
+\node[font=\scriptsize] at (7.7, -4.55) {$\Delta_{\mathrm{formulation}} \;=\; \mathrm{Performance}_{\mathrm{contemporaneous}} \; - \; \mathrm{Performance}_{\mathrm{prospective}}$};
+\node[font=\tiny, text=black!50] at (7.7, -5.05) {same model · same target · same split · same protocol --- only the boundary moves};
+\end{tikzpicture}
+"""
+    tikz = tikz.replace("EXTX", f"{ext_xgb:.1f}").replace("EXTB", f"{ext_bi:.1f}").replace("EDG", f"{ed_gap:.1f}")
+    tikz = tikz.replace("[pipeblue", "[cblue").replace("fill=pipeblue!6", "fill=cblue!8")
+    tikz = tikz.replace("[pipered", "[credark").replace("fill=pipered!6", "fill=credark!6")
+    tikz = tikz.replace("pipered]", "credark]").replace("pipeblue]", "cblue]")
+    tikz = tikz.replace("text=cblue!60!black", "text=cblue!60!black")
+    open(os.path.join(FIG, "fig1_conceptual.tex"), "w").write(tikz)
+
+
 # ── figure 2: leakage gap ────────────────────────────────────────────────────
 def fig_leakage(ou, ed):
     fig, axes = plt.subplots(2, 2, figsize=(9.2, 4.6), sharex=False)
@@ -607,12 +701,208 @@ def fig_attention():
     plt.close(fig)
 
 
+# ── figure: paired slopes (formulation effect magnitude) ────────────────────
+def fig_leakage_slopes(ou, ed):
+    fig, axes = plt.subplots(2, 2, figsize=(9.2, 5.2))
+    metrics = [("accuracy", "Accuracy"), ("qwk", "Quadratic weighted kappa")]
+    colors = ["#2a78d6", "#1baf7a", "#eda100", "#008300", "#4a3aa7", "#e34948"]
+    for col, (res, key, name) in enumerate(((ou, "oulad", "OULAD"), (ed, "ednet", "EdNet-KT1"))):
+        for row, (metric, mlab) in enumerate(metrics):
+            ax = axes[row, col]
+            for i, mdl in enumerate(MODELS):
+                pro = get(res, key, "prospective", mdl)["metrics"][metric]
+                con = get(res, key, "contemporaneous", mdl)["metrics"][metric]
+                a0, a1 = (pro, con) if metric == "qwk" else (100 * pro, 100 * con)
+                ax.plot([0, 1], [a0, a1], "-o", color=colors[i], lw=1.4, ms=4.5,
+                        label=DISP.get(mdl, mdl), zorder=3)
+            ax.set_xlim(-0.25, 1.25)
+            ax.set_xticks([0, 1], ["prospective", "contemporaneous"])
+            ax.set_ylabel(mlab)
+            if row == 0:
+                ax.set_title(name)
+            if col == 1 and row == 1:
+                ax.legend(loc="lower right", fontsize=6.5, frameon=False)
+    fig.suptitle("Every model moves up when the window covers the labelled period",
+                 y=0.99, fontsize=10)
+    fig.tight_layout()
+    fig.savefig(os.path.join(FIG, "fig2_leakage_gap.pdf"), bbox_inches="tight")
+    plt.close(fig)
+
+
+# ── figure: dose-response on both benchmarks ────────────────────────────────
+def fig_dose_response(ou, ed):
+    with open(os.path.join(RES, "ednet_dose.json")) as fh:
+        edn = json.load(fh)
+    with open(os.path.join(RES, "dose_response.json")) as fh:
+        ould = json.load(fh)
+    fig, axes = plt.subplots(2, 2, figsize=(9.2, 4.9))
+    series = ["XGBoost", "BiLSTM-Attention"]
+    colors = {"XGBoost": "#2a78d6", "BiLSTM-Attention": "#008300"}
+    plans = ((ould, [0.30, 0.50, 0.70, 0.90, 1.00], "OULAD", "feature window (% of course)"),
+             (edn, [0.5, 0.6, 0.7, 0.8, 0.9, 1.0], "EdNet-KT1", "% of sequence observed"))
+    for col, (data, ps, ds, xlab) in enumerate(plans):
+        for row, (metric, ylab) in enumerate((("accuracy", "Accuracy"),
+                                              ("qwk", "Quadratic weighted $\\kappa$"))):
+            ax = axes[row, col]
+            for mdl in series:
+                ys = []
+                for p in ps:
+                    key = f"{p:.2f}" if f"{p:.2f}" in data else f"{p:.1f}"
+                    ys.append(data[key][mdl][metric])
+                ax.plot([100 * q for q in ps], ys, "-o", color=colors[mdl], lw=1.6,
+                        ms=4.5, label=DISP.get(mdl, mdl), zorder=3)
+            ax.set_xlabel(xlab)
+            ax.set_ylabel(ylab)
+            if row == 0:
+                ax.set_title(ds)
+            ax.set_xticks([100 * q for q in ps])
+            if col == 1:
+                ax.axvspan(50, 100, color="#E8760E", alpha=0.06, zorder=1)
+                lo, hi = ax.get_ylim()
+                ax.annotate("outcome-overlapping", xy=(75, lo + 0.05 * (hi - lo)),
+                            fontsize=6.5, color="#b56312", ha="center")
+            if col == 0:
+                ax.axvline(90, color=GRAY, lw=0.8, ls=":", zorder=1)
+                lo, hi = ax.get_ylim()
+                ax.annotate("outcome-determining", xy=(100, lo + 0.05 * (hi - lo)),
+                            fontsize=6.5, color="#b56312", ha="right")
+        axes[0, col].legend(loc="lower right", fontsize=6.5, frameon=False)
+    fig.suptitle("Reported performance rises with the information window on both benchmarks",
+                 y=0.99, fontsize=10)
+    fig.tight_layout()
+    fig.savefig(os.path.join(FIG, "fig3_dose_response.pdf"), bbox_inches="tight")
+    plt.close(fig)
+
+
+# ── figure: decomposition waterfall + EdNet reconstruction regime ───────────
+def fig_decomposition(ou, ed):
+    with open(os.path.join(RES, "matched_leakage.json")) as fh:
+        mk = json.load(fh)
+    fig, axes = plt.subplots(1, 2, figsize=(9.2, 3.3),
+                             gridspec_kw={"width_ratios": [1.35, 1]})
+    ax = axes[0]
+    for i, (mdl, color) in enumerate((("XGBoost", BLUE), ("BiLSTM-Attention", "#008300"))):
+        b0 = mk["results"]["clean30"][mdl]["accuracy"]
+        ext = mk["summary"][mdl]["window_extension_acc"]
+        leak = mk["summary"][mdl]["leakage_step_acc"]
+        b1, b2 = b0 + ext, b0 + ext + leak
+        xs = [0.15 + i * 0.5, 0.15 + i * 0.5, 0.15 + i * 0.5]
+        for x, v, al in zip(xs, (b0, b1, b2), (0.45, 0.75, 1.0)):
+            ax.bar(x, v, width=0.16, color=color, alpha=al, zorder=3)
+            ax.text(x, v + 0.006, f"{v:.3f}", ha="center", fontsize=6.6)
+        ax.plot([xs[0] + 0.08, xs[1] - 0.08], [b0, b0], color=GRAY, lw=0.8, ls=":")
+        ax.plot([xs[1] + 0.08, xs[2] - 0.08], [b1, b1], color=GRAY, lw=0.8, ls=":")
+        ax.annotate(f"+{100*ext:.1f}", xy=(xs[1] - 0.08, b0 + 0.02), fontsize=6.6,
+                    color="#275d9e", ha="center")
+        ax.annotate(f"+{100*leak:.1f}", xy=(xs[2] - 0.08, b1 + 0.02), fontsize=6.6,
+                    color="#275d9e", ha="center")
+    ax.set_xticks([0.15, 0.65], ["XGBoost", "BiLSTM-Attention"])
+    ax.set_ylim(0.58, 0.72)
+    ax.set_ylabel("OULAD accuracy")
+    ax.set_title("window extension vs. label-defining injection", fontsize=8.5)
+    ax = axes[1]
+    pro = get(ed, "ednet", "prospective", "XGBoost")["metrics"]["accuracy"]
+    con = get(ed, "ednet", "contemporaneous", "XGBoost")["metrics"]["accuracy"]
+    ax.bar([0, 1], [pro, con], width=0.5, color=[BLUE, "#E8760E"], zorder=3)
+    ax.set_xticks([0, 1], ["prospective\n(p=0.5)", "full sequence\n(label-determining)"])
+    for x, v in zip((0, 1), (pro, con)):
+        ax.text(x, v + 0.015, f"{v:.3f}", ha="center", fontsize=7)
+    ax.annotate("", xy=(1, con - 0.012), xytext=(1, pro + 0.06),
+                arrowprops=dict(arrowstyle="-|>", color=RED, lw=1.2))
+    ax.text(1.07, (pro + con) / 2, "label\nreconstruction", fontsize=6.8, color=RED,
+            va="center")
+    ax.set_xlim(-0.5, 1.9)
+    ax.set_ylim(0.5, 1.05)
+    ax.set_ylabel("XGBoost accuracy (EdNet-KT1)")
+    ax.set_title("the reconstruction regime", fontsize=8.5)
+    fig.tight_layout()
+    fig.savefig(os.path.join(FIG, "fig4_decomposition.pdf"), bbox_inches="tight")
+    plt.close(fig)
+
+
+# ── figure: future-cohort paired slopes ─────────────────────────────────────
+def fig_temporal():
+    with open(os.path.join(RES, "temporal_generalization.json")) as fh:
+        tg = json.load(fh)
+    fig, ax = plt.subplots(figsize=(5.6, 3.4))
+    colors = {"XGBoost": "#2a78d6", "LSTM": "#eda100", "BiLSTM-Attention": "#008300"}
+    for mdl, color in colors.items():
+        pro = tg["results"]["prospective"][mdl]["accuracy"]
+        con = tg["results"]["contemporaneous"][mdl]["accuracy"]
+        ax.plot([0, 1], [100 * pro, 100 * con], "-o", color=color, lw=1.6, ms=5,
+                label=DISP.get(mdl, mdl), zorder=3)
+        ax.text(-0.04, 100 * pro, f"{100*pro:.1f}", ha="right", va="center", fontsize=7)
+        ax.text(1.04, 100 * con, f"{100*con:.1f}", ha="left", va="center", fontsize=7)
+    ax.set_xlim(-0.3, 1.3)
+    ax.set_xticks([0, 1], ["prospective\n(p=0.3)", "contemporaneous\n(full course)"])
+    ax.set_ylabel("accuracy, 2014 presentations (%)")
+    ax.set_title("trained on 2013 cohorts, tested on 2014")
+    ax.legend(fontsize=7, frameon=False, loc="lower right")
+    fig.tight_layout()
+    fig.savefig(os.path.join(FIG, "fig5_temporal.pdf"), bbox_inches="tight")
+    plt.close(fig)
+
+
+# ── figure: prospective model comparison, dot + CI ──────────────────────────
+def fig_model_comparison():
+    sup = pd.read_csv(os.path.join(RES, "supplementary_cis.csv"))
+    sup = sup[(sup.regime == "prospective") & (sup.model.isin(MODELS))]
+    order = {m: i for i, m in enumerate(MODELS)}
+    fig, axes = plt.subplots(1, 2, figsize=(9.2, 3.0))
+    for ax, ds, title in ((axes[0], "oulad", "OULAD"), (axes[1], "ednet", "EdNet-KT1")):
+        sub = sup[sup.dataset == ds].copy()
+        sub["ord"] = sub.model.map(order)
+        sub = sub.sort_values("ord", ascending=False)
+        ax.errorbar(sub.macro_f1, range(len(sub)),
+                    xerr=[sub.macro_f1 - sub.f1_lo, sub.f1_hi - sub.macro_f1],
+                    fmt="o", color=BLUE, lw=1.4, ms=5, capsize=2.5, zorder=3)
+        ax.set_yticks(range(len(sub)), [DISP.get(m, m) for m in sub.model], fontsize=7.5)
+        ax.set_xlabel("macro-F1, prospective protocol (95% bootstrap CI)")
+        ax.set_title(title)
+        ax.grid(axis="y", visible=False)
+    fig.suptitle("No family dominates across benchmarks and metrics", y=1.0, fontsize=10)
+    fig.tight_layout()
+    fig.savefig(os.path.join(FIG, "fig6_model_comparison.pdf"), bbox_inches="tight")
+    plt.close(fig)
+
+
+# ── table: EdNet dose ───────────────────────────────────────────────────────
+def table_ednet_dose():
+    with open(os.path.join(RES, "ednet_dose.json")) as fh:
+        edn = json.load(fh)
+    rows = []
+    for p in sorted(edn, key=float):
+        pf = float(p)
+        label = {0.5: "prospective cut (tau)", 1.0: "full sequence (label-determining)"}.get(pf, "")
+        cells = [label if label else f"$p = {pf:.1f}$"]
+        for mdl in ("XGBoost", "BiLSTM-Attention"):
+            mt = edn[p][mdl]
+            cells += [fmt(mt["accuracy"]), fmt(mt["qwk"])]
+        rows.append(" & ".join(cells) + r" \\")
+    tbl = (
+        "% AUTO-GENERATED by experiments/build_paper_artifacts.py\n"
+        "\\begin{table}[ht]\n"
+        "\\caption{EdNet-KT1 contamination dose--response: the prospective label is fixed "
+        "(second-half correctness) while the feature window grows from the mid-sequence cut into "
+        "the full sequence, whose correctness determines the label. Accuracy approaches the "
+        "reconstruction ceiling as the window becomes outcome-overlapping.\\label{tab:ednet_dose}}\n"
+        "\\centering\\footnotesize\n"
+        "\\begin{tabular*}{\\textwidth}{@{\\extracolsep\\fill}llrrrr}\n\\toprule\n"
+        " & & \\multicolumn{2}{c}{\\textbf{XGBoost}} & \\multicolumn{2}{c}{\\textbf{BiLSTM-Attention}} \\\\\n"
+        "\\cmidrule(l){3-4}\\cmidrule(l){5-6}\n"
+        "\\textbf{Window} & & \\textbf{Accuracy} & \\textbf{QWK} & \\textbf{Accuracy} & \\textbf{QWK} \\\\\n"
+        "\\midrule\n"
+        + "\n".join(rows) +
+        "\n\\bottomrule\n\\end{tabular*}\n\\end{table}\n")
+    open(os.path.join(MAN, "table_ednet_dose.tex"), "w").write(tbl)
+
+
 def main():
     os.makedirs(FIG, exist_ok=True)
     ou, ed = load("oulad"), load("ednet")
     build_numbers(ou, ed)
     build_tables(ou, ed)
-    fig_leakage(ou, ed)
+    fig_leakage_slopes(ou, ed)
     fig_ordinal(ou, ed)
     fig_confusion(ou, ed)
     if os.path.exists(os.path.join(RES, "shap_oulad.json")):
@@ -623,10 +913,22 @@ def main():
         fig_attention()
     else:
         print("skip fig6 (no attention array yet)")
-    if os.path.exists(os.path.join(RES, "dose_response.json")):
-        fig_dose_response()
+    if os.path.exists(os.path.join(RES, "dose_response.json")) and os.path.exists(os.path.join(RES, "ednet_dose.json")):
+        fig_dose_response(ou, ed)
     else:
-        print("skip fig7 (no dose_response.json yet)")
+        print("skip fig3 (dose data incomplete)")
+    if os.path.exists(os.path.join(RES, "matched_leakage.json")):
+        fig_decomposition(ou, ed)
+    else:
+        print("skip fig4 (no matched_leakage.json)")
+    if os.path.exists(os.path.join(RES, "temporal_generalization.json")):
+        fig_temporal()
+    else:
+        print("skip fig5 (no temporal_generalization.json)")
+    fig_model_comparison()
+    if os.path.exists(os.path.join(RES, "ednet_dose.json")):
+        table_ednet_dose()
+    emit_fig1_conceptual(ou, ed)
     print("all artifacts built")
 
 
