@@ -635,7 +635,7 @@ def fig_shap():
     vals = [f["mean_abs"] for f in feats]
     ax.barh(range(len(vals)), vals, height=0.62, color=BLUE, zorder=3)
     ax.set_yticks(range(len(vals)), names, fontsize=7.5)
-    ax.set_xlabel(r"mean $|$SHAP$|$ (avg.\ over classes)")
+    ax.set_xlabel("mean $|$SHAP$|$ (avg. over classes)")
     ax.set_title(f"Feature attribution — {sh['model']}, OULAD prospective")
     for i, v in enumerate(vals):
         ax.text(v, i, f" {v:.3f}", va="center", fontsize=7)
@@ -735,12 +735,12 @@ def fig_dose_response(ou, ed):
         edn = json.load(fh)
     with open(os.path.join(RES, "dose_response.json")) as fh:
         ould = json.load(fh)
-    fig, axes = plt.subplots(2, 2, figsize=(9.2, 4.9))
+    fig, axes = plt.subplots(2, 2, figsize=(9.2, 5.0))
     series = ["XGBoost", "BiLSTM-Attention"]
     colors = {"XGBoost": "#2a78d6", "BiLSTM-Attention": "#008300"}
-    plans = ((ould, [0.30, 0.50, 0.70, 0.90, 1.00], "OULAD", "feature window (% of course)"),
-             (edn, [0.5, 0.6, 0.7, 0.8, 0.9, 1.0], "EdNet-KT1", "% of sequence observed"))
-    for col, (data, ps, ds, xlab) in enumerate(plans):
+    plans = ((ould, [0.30, 0.50, 0.70, 0.90, 1.00], "OULAD"),
+             (edn, [0.5, 0.6, 0.7, 0.8, 0.9, 1.0], "EdNet-KT1"))
+    for col, (data, ps, ds) in enumerate(plans):
         for row, (metric, ylab) in enumerate((("accuracy", "Accuracy"),
                                               ("qwk", "Quadratic weighted $\\kappa$"))):
             ax = axes[row, col]
@@ -751,75 +751,102 @@ def fig_dose_response(ou, ed):
                     ys.append(data[key][mdl][metric])
                 ax.plot([100 * q for q in ps], ys, "-o", color=colors[mdl], lw=1.6,
                         ms=4.5, label=DISP.get(mdl, mdl), zorder=3)
-            ax.set_xlabel(xlab)
+            ax.set_xlim(ps[0] * 100 - 4, 104)
+            lo, hi = ax.get_ylim()
+            ax.set_ylim(lo, lo + (hi - lo) * 1.16)
+            ax.set_xlabel("information window (% of the period)")
             ax.set_ylabel(ylab)
             if row == 0:
                 ax.set_title(ds)
             ax.set_xticks([100 * q for q in ps])
             if col == 1:
-                ax.axvspan(50, 100, color="#E8760E", alpha=0.06, zorder=1)
-                lo, hi = ax.get_ylim()
-                ax.annotate("outcome-overlapping", xy=(75, lo + 0.05 * (hi - lo)),
-                            fontsize=6.5, color="#b56312", ha="center")
-            if col == 0:
+                ax.axvspan(50, 100, color="#E8760E", alpha=0.07, zorder=1)
+                ax.text(75, ax.get_ylim()[1] - 0.03 * (hi - lo), "outcome-overlapping window",
+                        fontsize=6.3, color="#b56312", ha="center", va="top")
+            else:
                 ax.axvline(90, color=GRAY, lw=0.8, ls=":", zorder=1)
-                lo, hi = ax.get_ylim()
-                ax.annotate("outcome-determining", xy=(100, lo + 0.05 * (hi - lo)),
-                            fontsize=6.5, color="#b56312", ha="right")
-        axes[0, col].legend(loc="lower right", fontsize=6.5, frameon=False)
+    handles, labels_ = axes[0, 0].get_legend_handles_labels()
+    fig.legend(handles, labels_, loc="upper center", bbox_to_anchor=(0.5, 0.955),
+               ncol=2, frameon=False, fontsize=8)
+    fig.tight_layout(rect=(0, 0, 1, 0.91))
     fig.suptitle("Reported performance rises with the information window on both benchmarks",
-                 y=0.99, fontsize=10)
-    fig.tight_layout()
+                 fontsize=10, y=0.995)
     fig.savefig(os.path.join(FIG, "fig3_dose_response.pdf"), bbox_inches="tight")
     plt.close(fig)
+
+
 
 
 # ── figure: decomposition waterfall + EdNet reconstruction regime ───────────
 def fig_decomposition(ou, ed):
     with open(os.path.join(RES, "matched_leakage.json")) as fh:
         mk = json.load(fh)
-    fig, axes = plt.subplots(1, 2, figsize=(9.2, 3.3),
-                             gridspec_kw={"width_ratios": [1.35, 1]})
+    with open(os.path.join(RES, "ednet_dose.json")) as fh:
+        edn = json.load(fh)
+    fig, axes = plt.subplots(1, 2, figsize=(9.4, 3.6),
+                             gridspec_kw={"width_ratios": [1.45, 1]})
     ax = axes[0]
-    for i, (mdl, color) in enumerate((("XGBoost", BLUE), ("BiLSTM-Attention", "#008300"))):
+    EXT_C, INJ_C = "#7fb3e3", "#E8760E"
+    models = [("XGBoost", BLUE, 0.0), ("BiLSTM-Attention", "#008300", 0.72)]
+    floor = 0.555
+    for mdl, color, gx in models:
         b0 = mk["results"]["clean30"][mdl]["accuracy"]
         ext = mk["summary"][mdl]["window_extension_acc"]
         leak = mk["summary"][mdl]["leakage_step_acc"]
         b1, b2 = b0 + ext, b0 + ext + leak
-        xs = [0.15 + i * 0.5, 0.15 + i * 0.5, 0.15 + i * 0.5]
-        for x, v, al in zip(xs, (b0, b1, b2), (0.45, 0.75, 1.0)):
-            ax.bar(x, v, width=0.16, color=color, alpha=al, zorder=3)
-            ax.text(x, v + 0.006, f"{v:.3f}", ha="center", fontsize=6.6)
-        ax.plot([xs[0] + 0.08, xs[1] - 0.08], [b0, b0], color=GRAY, lw=0.8, ls=":")
-        ax.plot([xs[1] + 0.08, xs[2] - 0.08], [b1, b1], color=GRAY, lw=0.8, ls=":")
-        ax.annotate(f"+{100*ext:.1f}", xy=(xs[1] - 0.08, b0 + 0.02), fontsize=6.6,
-                    color="#275d9e", ha="center")
-        ax.annotate(f"+{100*leak:.1f}", xy=(xs[2] - 0.08, b1 + 0.02), fontsize=6.6,
-                    color="#275d9e", ha="center")
-    ax.set_xticks([0.15, 0.65], ["XGBoost", "BiLSTM-Attention"])
-    ax.set_ylim(0.58, 0.72)
+        x0 = gx * 0.72
+        w = 0.26
+        ax.bar(x0 + w / 2, b0 - floor, bottom=floor, width=w, color=color, zorder=3)
+        ax.text(x0 + w / 2, floor - 0.006, DISP.get(mdl, mdl), ha="center", va="top",
+                fontsize=7.0)
+        ax.bar(x0 + w + w / 2 + 0.05, ext, bottom=b0, width=w, color=EXT_C, zorder=3)
+        ax.bar(x0 + 2 * w + 0.10, leak, bottom=b1, width=w, color=INJ_C, zorder=3)
+        ax.plot([x0 + w, x0 + w + 0.05], [b0, b0], color=GRAY, lw=0.8, ls=":", zorder=2)
+        ax.plot([x0 + w + w + 0.05, x0 + 2 * w + 0.10], [b1, b1], color=GRAY, lw=0.8,
+                ls=":", zorder=2)
+        ax.annotate(f"+{100*ext:.1f} pp", xy=(x0 + w + w / 2 + 0.05, b0 + ext / 2),
+                    ha="center", va="center", fontsize=6.4, color="#1b4c8f", zorder=6,
+                    bbox=dict(boxstyle="round,pad=0.15", fc="white", ec="none", alpha=0.85))
+        ax.annotate(f"+{100*leak:.1f} pp", xy=(x0 + 2 * w + 0.10 + w / 2 + 0.07, b1 + leak / 2),
+                    ha="left", va="center", fontsize=6.4, color="#8a3d10", zorder=6,
+                    bbox=dict(boxstyle="round,pad=0.15", fc="white", ec="none", alpha=0.85))
+        ax.annotate(f"{b2:.3f}", xy=(x0 + 2 * w + 0.10 + w / 2, b2 + 0.003),
+                    ha="center", va="bottom", fontsize=6.8, zorder=6)
+    ax.plot([], [], color=BLUE, lw=6, label="honest window (solid) / extension (light)")
+    ax.plot([], [], color=INJ_C, lw=6, label="label-defining injection")
+    ax.legend(fontsize=6.2, frameon=False, loc="upper left", handlelength=1.2)
+    ax.set_xticks([])
+    ax.set_ylim(floor, 0.715)
     ax.set_ylabel("OULAD accuracy")
-    ax.set_title("window extension vs. label-defining injection", fontsize=8.5)
+    ax.set_title("matched-window waterfall: what each component adds", fontsize=8.8)
+
     ax = axes[1]
-    pro = get(ed, "ednet", "prospective", "XGBoost")["metrics"]["accuracy"]
-    con = get(ed, "ednet", "contemporaneous", "XGBoost")["metrics"]["accuracy"]
-    ax.bar([0, 1], [pro, con], width=0.5, color=[BLUE, "#E8760E"], zorder=3)
-    ax.set_xticks([0, 1], ["prospective\n(p=0.5)", "full sequence\n(label-determining)"])
-    for x, v in zip((0, 1), (pro, con)):
-        ax.text(x, v + 0.015, f"{v:.3f}", ha="center", fontsize=7)
-    ax.annotate("", xy=(1, con - 0.012), xytext=(1, pro + 0.06),
-                arrowprops=dict(arrowstyle="-|>", color=RED, lw=1.2))
-    ax.text(1.07, (pro + con) / 2, "label\nreconstruction", fontsize=6.8, color=RED,
-            va="center")
-    ax.set_xlim(-0.5, 1.9)
-    ax.set_ylim(0.5, 1.05)
-    ax.set_ylabel("XGBoost accuracy (EdNet-KT1)")
-    ax.set_title("the reconstruction regime", fontsize=8.5)
+    pro_x = get(ed, "ednet", "prospective", "XGBoost")["metrics"]["accuracy"]
+    con_x = get(ed, "ednet", "contemporaneous", "XGBoost")["metrics"]["accuracy"]
+    pro_b = get(ed, "ednet", "prospective", "BiLSTM-Attention")["metrics"]["accuracy"]
+    con_b = get(ed, "ednet", "contemporaneous", "BiLSTM-Attention")["metrics"]["accuracy"]
+    ax.axhline(1.0, color=GRAY, lw=0.9, ls="--", zorder=1)
+    ax.plot([0, 1], [100 * pro_x, 100 * con_x], "-o", color=BLUE, lw=1.6, ms=5,
+            label="XGBoost", zorder=3)
+    ax.plot([0, 1], [100 * pro_b, 100 * con_b], "-o", color="#008300", lw=1.6, ms=5,
+            label="BiLSTM-Attention", zorder=3)
+    ax.text(-0.05, 100 * pro_b - 2.5, f"{100*pro_b:.1f}", ha="right", va="center", fontsize=6.8)
+    ax.text(1.05, 100 * con_b - 3.5, f"{100*con_b:.1f}", ha="left", va="center", fontsize=6.8)
+    ax.text(-0.05, 100 * pro_x + 2.5, f"{100*pro_x:.1f}", ha="right", va="center", fontsize=6.8)
+    ax.text(0.96, 100 * con_x - 4.5, f"{100*con_x:.1f}", ha="right", va="center", fontsize=6.8)
+    ax.set_xlim(-0.3, 1.3)
+    ax.set_ylim(45, 107)
+    ax.set_xticks([0, 1], ["prospective\n($p=0.5$)", "full sequence\n(label-determining)"])
+    ax.set_ylabel("accuracy (EdNet-KT1, %)")
+    ax.set_title("the reconstruction regime", fontsize=8.8)
+    ax.legend(fontsize=6.8, frameon=False, loc="lower right")
     fig.tight_layout()
     fig.savefig(os.path.join(FIG, "fig4_decomposition.pdf"), bbox_inches="tight")
     plt.close(fig)
 
 
+# ── figure: future-cohort paired slopes ─────────────────────────────────────
+# ── figure: future-cohort paired slopes ─────────────────────────────────────
 # ── figure: future-cohort paired slopes ─────────────────────────────────────
 def fig_temporal():
     with open(os.path.join(RES, "temporal_generalization.json")) as fh:

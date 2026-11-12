@@ -32,12 +32,12 @@ def fig_dose_response(ou, ed):
         edn = json.load(fh)
     with open(os.path.join(RES, "dose_response.json")) as fh:
         ould = json.load(fh)
-    fig, axes = plt.subplots(2, 2, figsize=(9.2, 4.9))
+    fig, axes = plt.subplots(2, 2, figsize=(9.2, 5.0))
     series = ["XGBoost", "BiLSTM-Attention"]
     colors = {"XGBoost": "#2a78d6", "BiLSTM-Attention": "#008300"}
-    plans = ((ould, [0.30, 0.50, 0.70, 0.90, 1.00], "OULAD", "feature window (% of course)"),
-             (edn, [0.5, 0.6, 0.7, 0.8, 0.9, 1.0], "EdNet-KT1", "% of sequence observed"))
-    for col, (data, ps, ds, xlab) in enumerate(plans):
+    plans = ((ould, [0.30, 0.50, 0.70, 0.90, 1.00], "OULAD"),
+             (edn, [0.5, 0.6, 0.7, 0.8, 0.9, 1.0], "EdNet-KT1"))
+    for col, (data, ps, ds) in enumerate(plans):
         for row, (metric, ylab) in enumerate((("accuracy", "Accuracy"),
                                               ("qwk", "Quadratic weighted $\\kappa$"))):
             ax = axes[row, col]
@@ -48,25 +48,26 @@ def fig_dose_response(ou, ed):
                     ys.append(data[key][mdl][metric])
                 ax.plot([100 * q for q in ps], ys, "-o", color=colors[mdl], lw=1.6,
                         ms=4.5, label=DISP.get(mdl, mdl), zorder=3)
-            ax.set_xlabel(xlab)
+            ax.set_xlim(ps[0] * 100 - 4, 104)
+            lo, hi = ax.get_ylim()
+            ax.set_ylim(lo, lo + (hi - lo) * 1.16)
+            ax.set_xlabel("information window (% of the period)")
             ax.set_ylabel(ylab)
             if row == 0:
                 ax.set_title(ds)
             ax.set_xticks([100 * q for q in ps])
             if col == 1:
-                ax.axvspan(50, 100, color="#E8760E", alpha=0.06, zorder=1)
-                lo, hi = ax.get_ylim()
-                ax.annotate("outcome-overlapping", xy=(75, lo + 0.05 * (hi - lo)),
-                            fontsize=6.5, color="#b56312", ha="center")
-            if col == 0:
+                ax.axvspan(50, 100, color="#E8760E", alpha=0.07, zorder=1)
+                ax.text(75, ax.get_ylim()[1] - 0.03 * (hi - lo), "outcome-overlapping window",
+                        fontsize=6.3, color="#b56312", ha="center", va="top")
+            else:
                 ax.axvline(90, color=GRAY, lw=0.8, ls=":", zorder=1)
-                lo, hi = ax.get_ylim()
-                ax.annotate("outcome-determining", xy=(100, lo + 0.05 * (hi - lo)),
-                            fontsize=6.5, color="#b56312", ha="right")
-        axes[0, col].legend(loc="lower right", fontsize=6.5, frameon=False)
+    handles, labels_ = axes[0, 0].get_legend_handles_labels()
+    fig.legend(handles, labels_, loc="upper center", bbox_to_anchor=(0.5, 0.955),
+               ncol=2, frameon=False, fontsize=8)
+    fig.tight_layout(rect=(0, 0, 1, 0.91))
     fig.suptitle("Reported performance rises with the information window on both benchmarks",
-                 y=0.99, fontsize=10)
-    fig.tight_layout()
+                 fontsize=10, y=0.995)
     fig.savefig(os.path.join(FIG, "fig3_dose_response.pdf"), bbox_inches="tight")
     plt.close(fig)
 
@@ -89,12 +90,14 @@ def fig_decomposition(ou, ed):
             ax.text(x, v + 0.006, f"{v:.3f}", ha="center", fontsize=6.6)
         ax.plot([xs[0] + 0.08, xs[1] - 0.08], [b0, b0], color=GRAY, lw=0.8, ls=":")
         ax.plot([xs[1] + 0.08, xs[2] - 0.08], [b1, b1], color=GRAY, lw=0.8, ls=":")
-        ax.annotate(f"+{100*ext:.1f}", xy=(xs[1] - 0.08, b0 + 0.02), fontsize=6.6,
-                    color="#275d9e", ha="center")
-        ax.annotate(f"+{100*leak:.1f}", xy=(xs[2] - 0.08, b1 + 0.02), fontsize=6.6,
-                    color="#275d9e", ha="center")
+        ax.annotate(f"+{100*ext:.1f} pp", xy=((xs[0] + xs[1]) / 2 + 0.08, b0 + 0.014),
+                    fontsize=6.6, color="#275d9e", ha="center",
+                    bbox=dict(boxstyle="round,pad=0.15", fc="white", ec="none", alpha=0.9))
+        ax.annotate(f"+{100*leak:.1f} pp", xy=((xs[1] + xs[2]) / 2 + 0.08, b1 + 0.014),
+                    fontsize=6.6, color="#275d9e", ha="center",
+                    bbox=dict(boxstyle="round,pad=0.15", fc="white", ec="none", alpha=0.9))
     ax.set_xticks([0.15, 0.65], ["XGBoost", "BiLSTM-Attention"])
-    ax.set_ylim(0.58, 0.72)
+    ax.set_ylim(0.555, 0.72)
     ax.set_ylabel("OULAD accuracy")
     ax.set_title("window extension vs. label-defining injection", fontsize=8.5)
     ax = axes[1]
@@ -106,7 +109,7 @@ def fig_decomposition(ou, ed):
         ax.text(x, v + 0.015, f"{v:.3f}", ha="center", fontsize=7)
     ax.annotate("", xy=(1, con - 0.012), xytext=(1, pro + 0.06),
                 arrowprops=dict(arrowstyle="-|>", color=RED, lw=1.2))
-    ax.text(1.07, (pro + con) / 2, "label\nreconstruction", fontsize=6.8, color=RED,
+    ax.text(1.32, (pro + con) / 2, "label\nreconstruction", fontsize=6.8, color=RED,
             va="center")
     ax.set_xlim(-0.5, 1.9)
     ax.set_ylim(0.5, 1.05)
