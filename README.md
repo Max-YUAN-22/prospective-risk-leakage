@@ -46,6 +46,7 @@ six models from logistic regression to a lightweight BiLSTM-Attention
 |---|---|---|
 | OULAD | https://analyse.kmi.open.ac.uk/open_dataset (7 CSVs) | CC BY 4.0 |
 | EdNet-KT1 | https://github.com/riiid/ednet (`KT1` interactions + `contents`) | CC BY-NC 4.0 |
+| ASSISTments 2009-2010 | FigShare mirror of `skill_builder_data.csv` (see run_assistments_dose.py) | public research dataset |
 
 Set the data paths at the top of `run_oulad.py` / `run_ednet.py` to your
 download locations. No restricted institutional data is used anywhere in this
@@ -63,7 +64,8 @@ python experiments/shap_analysis.py          # ~4 min
 python experiments/build_paper_artifacts.py  # regenerates all numbers/tables/figures
 python experiments/run_sweep.py              # optional: neural hyperparameter-sensitivity check
 python experiments/run_matched_leakage.py    # optional: matched-window leakage decomposition (paper Table 5)
-python experiments/run_temporal_generalization.py  # optional: 2013-train -> 2014-test cohort shift (Table 6)
+python experiments/run_temporal_generalization.py  # optional: 2013-train -> 2014-test cohort shift (Table 7)
+python experiments/run_assistments_dose.py   # optional: third-platform dose replication (ASSISTments)
 python experiments/export_ednet_sample.py    # optional: re-pin the EdNet sample
 python experiments/run_dose_response.py      # optional: leakage dose-response curve (fig 3 of the paper)
 python experiments/run_label_ordering.py     # optional: label-ordering sensitivity check

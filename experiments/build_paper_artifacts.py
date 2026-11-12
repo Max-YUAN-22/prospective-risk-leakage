@@ -205,6 +205,14 @@ def build_numbers(ou, ed):
             edn = json.load(fh)
         mac("ednetDoseXGBAcc", fmt(edn["1.0"]["XGBoost"]["accuracy"]))
         mac("ednetDoseBiAcc", fmt(edn["1.0"]["BiLSTM-Attention"]["accuracy"]))
+    if os.path.exists(os.path.join(RES, "assistments_dose.json")):
+        with open(os.path.join(RES, "assistments_dose.json")) as fh:
+            asm = json.load(fh)
+        mac("assistAccFirst", fmt(asm["0.5"]["XGBoost"]["accuracy"]))
+        mac("assistAccLast", fmt(asm["1.0"]["XGBoost"]["accuracy"]))
+        mac("assistQwkFirst", fmt(asm["0.5"]["XGBoost"]["qwk"]))
+        mac("assistQwkLast", fmt(asm["1.0"]["XGBoost"]["qwk"]))
+        mac("assistCohort", "2{,}314")
 
     # matched-window leakage decomposition (OULAD)
     if os.path.exists(os.path.join(RES, "matched_leakage.json")):
@@ -735,12 +743,24 @@ def fig_dose_response(ou, ed):
         edn = json.load(fh)
     with open(os.path.join(RES, "dose_response.json")) as fh:
         ould = json.load(fh)
-    fig, axes = plt.subplots(2, 2, figsize=(9.2, 5.0))
-    series = ["XGBoost", "BiLSTM-Attention"]
+    if os.path.exists(os.path.join(RES, "assistments_dose.json")):
+        with open(os.path.join(RES, "assistments_dose.json")) as fh:
+            asm = json.load(fh)
+    else:
+        asm = None
+    fig, axes = plt.subplots(2, 3, figsize=(12.6, 4.6))
     colors = {"XGBoost": "#2a78d6", "BiLSTM-Attention": "#008300"}
-    plans = ((ould, [0.30, 0.50, 0.70, 0.90, 1.00], "OULAD"),
-             (edn, [0.5, 0.6, 0.7, 0.8, 0.9, 1.0], "EdNet-KT1"))
-    for col, (data, ps, ds) in enumerate(plans):
+    plans = ((ould, [0.30, 0.50, 0.70, 0.90, 1.00], "OULAD",
+              ["XGBoost", "BiLSTM-Attention"]),
+             (edn, [0.5, 0.6, 0.7, 0.8, 0.9, 1.0], "EdNet-KT1",
+              ["XGBoost", "BiLSTM-Attention"]),
+             (asm, [0.5, 0.6, 0.7, 0.8, 0.9, 1.0], "ASSISTments",
+              ["XGBoost"]))
+    for col, (data, ps, ds, series) in enumerate(plans):
+        if data is None:
+            for row in range(2):
+                axes[row, col].axis("off")
+            continue
         for row, (metric, ylab) in enumerate((("accuracy", "Accuracy"),
                                               ("qwk", "Quadratic weighted $\\kappa$"))):
             ax = axes[row, col]
@@ -759,24 +779,24 @@ def fig_dose_response(ou, ed):
             if row == 0:
                 ax.set_title(ds)
             ax.set_xticks([100 * q for q in ps])
-            if col == 1:
+            if col >= 1:
                 ax.axvspan(50, 100, color="#E8760E", alpha=0.07, zorder=1)
-                ax.text(75, ax.get_ylim()[1] - 0.03 * (hi - lo), "outcome-overlapping window",
-                        fontsize=6.3, color="#b56312", ha="center", va="top")
+                lo2, hi2 = ax.get_ylim()
+                ax.text(75, hi2 - 0.03 * (hi2 - lo2), "outcome-overlapping window",
+                        fontsize=5.8, color="#b56312", ha="center", va="top")
             else:
                 ax.axvline(90, color=GRAY, lw=0.8, ls=":", zorder=1)
     handles, labels_ = axes[0, 0].get_legend_handles_labels()
     fig.legend(handles, labels_, loc="upper center", bbox_to_anchor=(0.5, 0.955),
                ncol=2, frameon=False, fontsize=8)
     fig.tight_layout(rect=(0, 0, 1, 0.91))
-    fig.suptitle("Reported performance rises with the information window on both benchmarks",
+    fig.suptitle("Reported performance rises with the information window on all three benchmarks",
                  fontsize=10, y=0.995)
     fig.savefig(os.path.join(FIG, "fig3_dose_response.pdf"), bbox_inches="tight")
     plt.close(fig)
 
 
-
-
+# ── figure: decomposition waterfall + EdNet reconstruction regime ───────────
 # ── figure: decomposition waterfall + EdNet reconstruction regime ───────────
 def fig_decomposition(ou, ed):
     with open(os.path.join(RES, "matched_leakage.json")) as fh:
